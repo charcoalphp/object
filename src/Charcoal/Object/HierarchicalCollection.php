@@ -70,7 +70,7 @@ class HierarchicalCollection extends CharcoalCollection
         foreach ($this->objects as $object) {
             // Repair bad hierarchy.
             if ($object->hasMaster() && $object->getMaster() === $object->id()) {
-                $object->setMaster(0);
+                $object->setMaster(null);
                 $object->update([ 'master' ]);
             }
 
@@ -107,6 +107,18 @@ class HierarchicalCollection extends CharcoalCollection
                         ($level + 1),
                         $sortedObjects
                     );
+                }
+            }
+
+            // Display orphaned descendants.
+            if ($childObjects) {
+                foreach ($childObjects as $orphans) {
+                    foreach ($orphans as $descendants) {
+                        $descendants->level = 0;
+                        $sortedObjects[$descendants->id()] = $descendants;
+
+                        $count++;
+                    }
                 }
             }
         } else {
